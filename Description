@@ -1,51 +1,109 @@
-Bhakti Sādhana Tracker Bot
-A Discord bot designed to help devotees systematically track their daily bhakti sādhana practices and stay steady on the path of Krishna consciousness.
-Built with ❤️ for the devotee community.
+import discord
+from discord.ext import commands
+import json
+import os
 
-Features ✨
-📿 Track daily chanting rounds.
+# Load or initialize user data
+DATA_FILE = 'sadhana_data.json'
 
-📖 Record reading of Śrīla Prabhupāda’s books.
+if not os.path.exists(DATA_FILE):
+    with open(DATA_FILE, 'w') as f:
+        json.dump({}, f)
 
-🚫 Log adherence to the four regulative principles.
+def load_data():
+    with open(DATA_FILE, 'r') as f:
+        return json.load(f)
 
-🧘 Track other activities like ārati attendance, class hearing, and kīrtana participation.
+def save_data(data):
+    with open(DATA_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
 
-📈 Get daily and weekly progress reports.
+# Create the bot
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix='/', intents=intents)
 
-🎯 Set personal spiritual goals.
+@bot.event
+async def on_ready():
+    print(f'✅ {bot.user} has connected to Discord!')
 
-🌸 Promote community inspiration through progress sharing.
+# Command to log chanting rounds
+@bot.command()
+async def chant(ctx, rounds: int):
+    data = load_data()
+    user_id = str(ctx.author.id)
 
-Why this Bot?
-Maintaining regulated sādhana is the foundation for spiritual advancement. This bot helps devotees:
+    if user_id not in data:
+        data[user_id] = {'chanting': 0, 'reading': 0, 'principles_followed': 0}
 
-Stay accountable
+    data[user_id]['chanting'] += rounds
+    save_data(data)
 
-Build strong devotional habits
+    await ctx.send(f'📿 {ctx.author.mention}, you have logged {rounds} rounds today! Haribol! 🙌')
 
-Monitor their spiritual progress
+# Command to log reading
+@bot.command()
+async def read(ctx, minutes: int):
+    data = load_data()
+    user_id = str(ctx.author.id)
 
-Encourage each other in their spiritual journey
+    if user_id not in data:
+        data[user_id] = {'chanting': 0, 'reading': 0, 'principles_followed': 0}
 
-Built With 🛠️
-Python
+    data[user_id]['reading'] += minutes
+    save_data(data)
 
-discord.py
+    await ctx.send(f'📖 {ctx.author.mention}, you have logged {minutes} minutes of reading today! Jai Śrīla Prabhupāda! 📚')
 
-JSON / Database for user data storage
+# Command to confirm following regulative principles
+@bot.command()
+async def principles(ctx):
+    data = load_data()
+    user_id = str(ctx.author.id)
 
-(Optional) BeautifulSoup (for other features like Vedabase Verse Fetching if included)
+    if user_id not in data:
+        data[user_id] = {'chanting': 0, 'reading': 0, 'principles_followed': 0}
 
-Getting Started 🚀
-Clone the repository.
+    data[user_id]['principles_followed'] += 1
+    save_data(data)
 
-Install the dependencies.
+    await ctx.send(f'🚫 {ctx.author.mention}, recorded that you followed the four regulative principles today! Very good! 🌸')
 
-Set up your Discord bot token and environment variables.
+# Command to view progress report
+@bot.command()
+async def report(ctx):
+    data = load_data()
+    user_id = str(ctx.author.id)
 
-Run the bot!
+    if user_id not in data:
+        await ctx.send(f'😥 {ctx.author.mention}, no sādhana data found. Start today!')
+        return
 
-bash
-Copy
-Edit
+    user_data = data[user_id]
+
+    embed = discord.Embed(
+        title=f"📜 Bhakti Sādhana Report for {ctx.author.display_name}",
+        color=discord.Color.green()
+    )
+    embed.add_field(name="Chanting Rounds", value=f"{user_data['chanting']} rounds", inline=False)
+    embed.add_field(name="Reading Time", value=f"{user_data['reading']} minutes", inline=False)
+    embed.add_field(name="Regulative Principles Followed", value=f"{user_data['principles_followed']} days", inline=False)
+
+    await ctx.send(embed=embed)
+
+# Command to reset daily sadhana
+@bot.command()
+async def reset(ctx):
+    data = load_data()
+    user_id = str(ctx.author.id)
+
+    if user_id in data:
+        data[user_id] = {'chanting': 0, 'reading': 0, 'principles_followed': 0}
+        save_data(data)
+        await ctx.send(f'🔄 {ctx.author.mention}, your sādhana log has been reset for today!')
+    else:
+        await ctx.send(f'🤔 {ctx.author.mention}, no sādhana data found to reset.')
+
+# Run the bot
+bot.run('YOUR_BOT_TOKEN')
+
