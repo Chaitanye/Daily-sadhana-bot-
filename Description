@@ -1,0 +1,51 @@
+Bhakti Sādhana Tracker Bot
+A Discord bot designed to help devotees systematically track their daily bhakti sādhana practices and stay steady on the path of Krishna consciousness.
+Built with ❤️ for the devotee community.
+
+Features ✨
+📿 Track daily chanting rounds.
+
+📖 Record reading of Śrīla Prabhupāda’s books.
+
+🚫 Log adherence to the four regulative principles.
+
+🧘 Track other activities like ārati attendance, class hearing, and kīrtana participation.
+
+📈 Get daily and weekly progress reports.
+
+🎯 Set personal spiritual goals.
+
+🌸 Promote community inspiration through progress sharing.
+
+Why this Bot?
+Maintaining regulated sādhana is the foundation for spiritual advancement. This bot helps devotees:
+
+Stay accountable
+
+Build strong devotional habits
+
+Monitor their spiritual progress
+
+Encourage each other in their spiritual journey
+
+Built With 🛠️
+Python
+
+discord.py
+
+JSON / Database for user data storage
+
+(Optional) BeautifulSoup (for other features like Vedabase Verse Fetching if included)
+
+Getting Started 🚀
+Clone the repository.
+
+Install the dependencies.
+
+Set up your Discord bot token and environment variables.
+
+Run the bot!
+
+bash
+Copy
+Edit
